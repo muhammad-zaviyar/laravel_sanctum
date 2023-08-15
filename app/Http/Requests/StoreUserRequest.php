@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rules\Password;
 
 class StoreUserRequest extends FormRequest
@@ -28,4 +30,12 @@ class StoreUserRequest extends FormRequest
             'password' => ['required', 'confirmed', Password::defaults()]
         ];
     }
+
+    protected function failedValidation(Validator $validator)
+    {
+        $response = apiResponse(null, 'failed', $validator->errors()->all(), 422);
+        throw new HttpResponseException($response);
+    }
+
+
 }

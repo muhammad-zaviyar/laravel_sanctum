@@ -9,8 +9,6 @@ use App\Models\User;
 use App\Repository\UserRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -34,14 +32,14 @@ class AuthController extends Controller
 
             $userResource = new UserResource($user);
 
-            $token = $user->createToken('Api Token of' . $user->name)->plainTextToken;
+            $token = $user->createToken('Api Token of ' . $user->name)->plainTextToken;
 
             return apiResponse(
                 [
                     'user' => $userResource,
                     'token' => $token
                 ],
-                'success',
+                'successful',
                 'You are logged In Successfully'
             );
 
@@ -53,26 +51,38 @@ class AuthController extends Controller
         }
     }
 
-    public function register(StoreUserRequest $request)
+    public function registration(StoreUserRequest $request)
     {
-        $request->validated($request->all());
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-        return success([
-            'user' => $user,
-            'token' => $user->createToken('API Token of ' . $user->name)->plainTextToken
-        ]);
+        try {
+            $user = $this->userRepository->createUser($request->all());
+
+            $userResource = new UserResource($user);
+
+            $token = $user->createToken('Api Token of ' . $user->name)->plainTextToken;
+
+            return apiResponse(
+                [
+                    'user' => $userResource,
+                    'token' => $token
+                ],
+                'successful',
+                'Your account has been registered successfully'
+            );
+
+        } catch (\Exception $e) {
+
+            $message  = $e->getMessage();
+            return apiResponse(null, 'failed', $message, 500);
+
+        }
     }
 
     public function logout()
     {
         Auth::user()->currentAccessToken()->delete();
 
-        return success([
-            'message' => 'You have successfully been logged out and your token has been deleted',
-        ]);
+        $message = 'You have successfully been logged out and your token has been deleted';
+
+        return apiResponse(null, 'success', $message, 500);
     }
 }
