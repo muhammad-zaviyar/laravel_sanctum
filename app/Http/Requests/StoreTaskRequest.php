@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreTaskRequest extends FormRequest
 {
@@ -26,5 +28,11 @@ class StoreTaskRequest extends FormRequest
             'description' => ['required'],
             'priority' => ['required'],
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        $response = apiResponse(null, 'failed', $validator->errors()->all(), 422);
+        throw new HttpResponseException($response);
     }
 }
