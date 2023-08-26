@@ -66,7 +66,7 @@ class AuthController extends Controller
                     'token' => $token
                 ],
                 'successful',
-                'Your account has been registered successfully'
+                'Your account has been registered successfully',
             );
 
         } catch (\Exception $e) {

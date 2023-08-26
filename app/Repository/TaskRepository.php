@@ -22,7 +22,7 @@ class TaskRepository implements TaskInterface
             'description' => $request->description,
             'priority'=> $request->priority,
         ]);
-        
+
         return $task;
     }
 

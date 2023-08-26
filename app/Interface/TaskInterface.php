@@ -8,5 +8,4 @@ interface TaskInterface
 
     function createTask($request);
 
-
 }
